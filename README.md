@@ -16,6 +16,6 @@ npm run build
 
 npm install -g serve
 
-serve -s dist
+nohup serve -s dist &
 ```
 http://localhost:3000 にアクセスします。
