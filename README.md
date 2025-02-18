@@ -19,3 +19,9 @@ npm install -g serve
 nohup serve -s dist &
 ```
 http://localhost:3000 にアクセスします。
+
+## プロセスを停止する方法
+```
+ps aux | grep 'serve -s dist'
+kill <PID>
+```
