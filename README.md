@@ -18,4 +18,4 @@ npm install -g serve
 
 serve -s dist
 ```
-http://localhost:5000 にアクセスします。
+http://localhost:3000 にアクセスします。
