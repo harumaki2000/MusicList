@@ -20,9 +20,10 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { auth, login, logout, addSongToFirestore, getSongsFromFirestore } from '../firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 
 export default {
   setup() {
