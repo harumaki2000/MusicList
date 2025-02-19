@@ -1,64 +1,77 @@
 <template>
   <div>
-    <input 
-      v-model="inputText" 
-      placeholder="曲名 - アーティスト名 - アルバム名" 
-      @keyup.enter="addSong"
-    />
+    <h2>曲のリスト</h2>
+    <input v-model="newSong" @keyup.enter="addSong" placeholder="曲名 - アーティスト - アルバム" />
     <button @click="addSong">追加</button>
-
-    <ul>
-      <li v-for="(song, index) in songs" :key="index">
-        <strong>{{ song.title }}</strong> - 
-        {{ song.artist }} - 
-        <em>{{ song.album }}</em>
-        <button @click="removeSong(index)">削除</button>
-      </li>
-    </ul>
+    
+    <div v-for="(songs, date) in groupedSongs" :key="date">
+      <h3>{{ date }}</h3>
+      <ul>
+        <li v-for="(count, song) in songs" :key="song">
+          {{ song }} - 再生回数: {{ count }}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
+import { ref, computed } from 'vue';
 
-export default defineComponent({
-  name: 'MusicList',
-  props: {
-    songs: {
-      type: Array as PropType<Array<{ title: string, artist: string, album: string }>>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      inputText: '',
+export default {
+  setup() {
+    const songs = ref<{ title: string; artist: string; album: string; date: string }[]>([]);
+    const newSong = ref('');
+
+    const getCurrentDate = () => {
+      const today = new Date();
+      return today.toISOString().split('T')[0];
     };
-  },
-  methods: {
-    addSong() {
-      const parts = this.inputText.split(' - ');
+
+    const addSong = () => {
+      const parts = newSong.value.split(' - ').map(s => s.trim());
+
       if (parts.length === 3) {
-        const newSong = {
-          title: parts[0].trim(),
-          artist: parts[1].trim(),
-          album: parts[2].trim(),
-        };
-        this.$emit('add-song', newSong);
-        this.inputText = ''; 
+        const [title, artist, album] = parts;
+        songs.value.push({ title, artist, album, date: getCurrentDate() });
+        newSong.value = '';
+      } else {
+        alert('フォーマットは「曲名 - アーティスト - アルバム」にしてください');
       }
-    },
-    removeSong(index: number) {
-      this.$emit('remove-song', index);
-    },
-  },
-});
+    };
+
+    const groupedSongs = computed(() => {
+      const result: Record<string, Record<string, number>> = {};
+
+      songs.value.forEach(({ title, date }) => {
+        if (!result[date]) {
+          result[date] = {};
+        }
+        result[date][title] = (result[date][title] || 0) + 1;
+      });
+
+      return result;
+    });
+
+    return {
+      newSong,
+      songs,
+      addSong,
+      groupedSongs
+    };
+  }
+};
 </script>
 
-<style scoped>
+<style>
 input {
-  width: 300px;
   padding: 5px;
-  font-size: 16px;
+  margin-right: 5px;
+}
+button {
+  padding: 5px;
+}
+h3 {
+  margin-top: 20px;
 }
 </style>
