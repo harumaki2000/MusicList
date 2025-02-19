@@ -1,57 +1,56 @@
 <template>
   <div id="app">
     <h1>MusicList</h1>
-    <div class="tabs">
-      <button @click="activeTab = 'list'" :class="{ active: activeTab === 'list' }">リスト</button>
-      <button @click="activeTab = 'chart'" :class="{ active: activeTab === 'chart' }">グラフ</button>
-    </div>
-    <div class="tab-content">
-      <MusicList v-if="activeTab === 'list'" />
-      <SongChart v-if="activeTab === 'chart'" />
-    </div>
+    <MusicList :songs="songs" @add-song="addSong" @remove-song="removeSong" />
+    <h2>SongChart</h2>
+    <SongChart :songs="songs" />
   </div>
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
+import { defineComponent } from 'vue';
 import MusicList from './components/MusicList.vue';
 import SongChart from './components/SongChart.vue';
 
-export default {
+export default defineComponent({
   name: "App",
   components: {
     MusicList,
     SongChart,
   },
-  setup() {
-    const activeTab = ref('list');
-    return { activeTab };
+  data() {
+    return {
+      songs: [] as Array<{ title: string, artist: string, album: string }>,
+    };
   },
-};
+  methods: {
+    addSong(song: { title: string, artist: string, album: string }) {
+      this.songs.push(song);
+      this.saveToLocalStorage();
+    },
+    removeSong(index: number) {
+      this.songs.splice(index, 1);
+      this.saveToLocalStorage();
+    },
+    saveToLocalStorage() {
+      localStorage.setItem('songs', JSON.stringify(this.songs));
+    },
+    loadFromLocalStorage() {
+      const savedSongs = localStorage.getItem('songs');
+      if (savedSongs) {
+        this.songs = JSON.parse(savedSongs);
+      }
+    },
+  },
+  created() {
+    this.loadFromLocalStorage();
+  }
+});
 </script>
 
 <style>
-.tabs {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.tabs button {
-  padding: 10px 20px;
-  margin: 0 10px;
-  border: none;
-  background-color: #ddd;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.tabs button.active {
-  background-color: #007bff;
-  color: white;
-}
-
-.tab-content {
+#app {
   text-align: center;
+  margin-top: 50px;
 }
 </style>
