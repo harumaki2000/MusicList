@@ -16,6 +16,8 @@ npm run build
 
 npm install -g serve
 
+npm install firebase
+
 nohup serve -s dist &
 ```
 http://localhost:3000 にアクセスします。
